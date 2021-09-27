@@ -75,7 +75,7 @@ namespace CA210924
         }
         public Species Species { get; set; }
 
-        public int TopPlusDepth => Top + Depth;
+        public int DpT => Top + Depth;
     }
 
 
@@ -92,13 +92,18 @@ namespace CA210924
             MelysekbenUszoHalakSzama(melyseg: 1.1F);
             FoLoop();
             KiirTo();
-            //Jelentes();
+            Jelentes();
             Console.ReadKey(true);
         }
 
+        static List<Fish> megevettHalak = new List<Fish>();
+
         private static void Jelentes()
         {
-            throw new NotImplementedException();
+            float osszSuly = 0F;
+            foreach (var h in megevettHalak)
+                osszSuly += h.Weight;
+            Console.WriteLine($"Összesen {osszSuly}Kg  növényevőt ettek meg ({megevettHalak.Count} db halat)");
         }
 
         private static void FoLoop()
@@ -109,8 +114,13 @@ namespace CA210924
                 int y = rnd.Next(to.Count);
 
 
-                bool harmincSzazalek = rnd.Next(100) < 30;
-                bool beTudUszni = to[x].TopPlusDepth > to[y].Top;
+                //bool harmincSzazalek = rnd.Next(100) < 30;
+                bool harmincSzazalek = true;
+
+                bool beTudUszni = 
+                    to[x].DpT >= to[y].Top 
+                    && to[y].DpT >= to[x].Top;
+
                 bool egyikRagadozo = to[x].Predator != to[y].Predator;
 
                 if (harmincSzazalek && beTudUszni && egyikRagadozo)
@@ -129,6 +139,7 @@ namespace CA210924
                         novenyevo = to[x];
                     }
 
+                    megevettHalak.Add(novenyevo);
                     to.Remove(novenyevo);
                     if(ragadozo.Weight <= 36) ragadozo.Weight *= 1.09F;
                 }
@@ -173,7 +184,7 @@ namespace CA210924
                 Console.ForegroundColor = 
                     h.Predator ? ConsoleColor.Red : ConsoleColor.Green;
 
-                Console.WriteLine("[{4,2}]{0,-9} {1:00.0}Kg [{2,3}-{3,3}]cm",
+                Console.WriteLine("[{4,2}]{0,-9} {1,4:0.0}Kg [{2,3}-{3,3}]cm",
                     h.Species, h.Weight, h.Top, h.Top + h.Depth, to.IndexOf(h));
             }
             Console.ResetColor();
